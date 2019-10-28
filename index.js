@@ -9,11 +9,38 @@ const server = express();
 server.get(cors());
 server.use(express.json());
 
+server.put("/api/users/:id", updateUser);
 server.delete("/api/users/:id", deleteUser);
 server.post("/api/users", createNewUSer);
 server.get("/api/users/:id", getUserById);
 server.get("/api/users", getAllUsers);
 server.get("*", handleDefaultRequest);
+
+function updateUser(req, res) {
+  const id = req.params.id;
+  const changes = req.body;
+
+  db.update(id, changes)
+    .then(updated => {
+      if (updated) {
+        res.status(200).json({
+          success: true,
+          updated
+        });
+      } else {
+        res.status(404).json({
+          success: false,
+          message: "The user with the specified ID does not exist."
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).json({
+        success: false,
+        error: "The user information could not be modified."
+      });
+    });
+}
 
 function deleteUser(req, res) {
   const id = req.params.id;
