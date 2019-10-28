@@ -10,6 +10,7 @@ server.get(cors());
 server.use(express.json());
 
 server.post("/api/users", createNewUSer);
+server.get("/api/users/:id", getUserById);
 server.get("/api/users", getAllUsers);
 server.get("*", handleDefaultRequest);
 
@@ -29,6 +30,32 @@ function createNewUSer(req, res) {
       res.status(400).json({
         success: false,
         errorMessage: "Please provide name and bio for the user."
+      });
+    });
+}
+
+function getUserById(req, res) {
+  const id = req.params.id;
+  console.log(id);
+
+  db.findById(id)
+    .then(data => {
+      if (data) {
+        res.status(200).json({
+          success: true,
+          data
+        });
+      } else {
+        res.status(404).json({
+          success: false,
+          message: "The user with the specified ID does not exist."
+        });
+      }
+    })
+    .catch(error => {
+      res.status(500).json({
+        success: false,
+        error: "The user information could not be retrieved."
       });
     });
 }
