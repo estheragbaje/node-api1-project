@@ -9,10 +9,33 @@ const server = express();
 server.get(cors());
 server.use(express.json());
 
+server.delete("/api/users/:id", deleteUser);
 server.post("/api/users", createNewUSer);
 server.get("/api/users/:id", getUserById);
 server.get("/api/users", getAllUsers);
 server.get("*", handleDefaultRequest);
+
+function deleteUser(req, res) {
+  const id = req.params.id;
+
+  db.remove(id)
+    .then(deleted => {
+      if (deleted) {
+        res.status(204).end();
+      } else {
+        res.status(404).json({
+          success: false,
+          message: "The user with the specified ID does not exist."
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).json({
+        sucess: false,
+        error: "The user could not be removed"
+      });
+    });
+}
 
 function createNewUSer(req, res) {
   const user = {
