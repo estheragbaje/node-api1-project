@@ -9,9 +9,29 @@ const server = express();
 server.get(cors());
 server.use(express.json());
 
-
+server.post("/api/users", createNewUSer);
 server.get("/api/users", getAllUsers);
 server.get("*", handleDefaultRequest);
+
+function createNewUSer(req, res) {
+  const user = {
+    name: req.body.name,
+    bio: req.body.bio
+  };
+
+  db.insert(req.body)
+    .then(data => {
+      console.log(data);
+      res.status(201).json(data);
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(400).json({
+        success: false,
+        errorMessage: "Please provide name and bio for the user."
+      });
+    });
+}
 
 function getAllUsers(req, res) {
   db.find()
